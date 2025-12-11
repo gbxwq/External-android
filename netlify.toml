@@ -1,0 +1,19 @@
+[build]
+	publish = "."
+
+[[redirects]]
+	from = "/*"
+	to = "/index.html"
+	status = 200
+	force = true
+
+[[headers]]
+	for = "/*"
+	[headers.values]
+		Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+		X-Frame-Options = "DENY"
+		X-Content-Type-Options = "nosniff"
+		Referrer-Policy = "no-referrer-when-downgrade"
+		X-XSS-Protection = "1; mode=block"
+		Permissions-Policy = "geolocation=(), microphone=()"
+		Content-Security-Policy = "default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https: wss:; frame-ancestors 'none';"
