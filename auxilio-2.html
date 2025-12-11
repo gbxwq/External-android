@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#2b0057">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="1nxit">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>External - 1nxit</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <style>
+    :root {
+      --bg: #3b0b5f;       /* roxo escuro do fundo */
+      --panel: #f3e8ff;    /* painel roxo claro para contraste */
+      --accent: #8b39ff;
+      --accent-2: #6b00d9;
+      --muted: #000000;    /* textos em preto */
+      --glass: rgba(255,255,255,0.06);
+    }
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    /* permitir seleção dentro de controles de formulário */
+    input, textarea, select, button {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 10%, rgba(139,57,255,0.15) 0%, var(--bg) 40%), var(--bg);
+      height: 100vh;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    canvas#rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, var(--panel), rgba(243,232,255,0.95));
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid rgba(107,0,217,0.18);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
+      position: relative;
+      z-index: 2;
+      color: var(--muted);
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 18px;
+      overflow: hidden;
+    }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--muted);
+    }
+    p.small {
+      margin: 6px 0 14px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .login-row {
+      margin-top: 10px;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(107,0,217,0.12);
+      background: var(--glass);
+      color: var(--muted);
+      outline: none;
+      font-size: 16px;
+    }
+    button.primary {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      background: rgba(0,0,0,0.04);
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .tab.active {
+      background: linear-gradient(90deg, rgba(139,57,255,0.12), rgba(107,0,217,0.08));
+      border-color: rgba(107,0,217,0.18);
+      color: var(--muted);
+    }
+    .tab i {
+      margin-right: 6px;
+    }
+    .panel-content {
+      margin-top: 14px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .option label {
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .switch {
+      width: 40px;
+      height: 24px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.06);
+      position: relative;
+      outline: none;
+    }
+    .switch .knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: all .18s ease;
+    }
+    .switch.on {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+    .switch.on .knob {
+      left: 19px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .switch:focus {
+      box-shadow: 0 0 0 3px rgba(107,0,217,0.12);
+    }
+    .inject-wrap {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .notify {
+      display: none;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.06);
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .copyright {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .small-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .fov-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .fov-slider {
+      flex: 1;
+    }
+    .fov-value {
+      min-width: 50px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(0,0,0,0.04);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="card">
+  <div class="title">
+    <div class="logo" role="img" aria-label="Logo 1n">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAwADACwAABAAD/xAAUAAEBAAAAAAAAAAAAAAAAAAAAC/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A/9k=" alt="Logo 1n">
+    </div>
+    <div>
+      <h1>EXTERNAL - 1nXIt</h1>
+      <p class="small">Painel Externo | Versão Mobile</p>
+    </div>
+  </div>
+
+  <div id="loginSection">
+    <div class="login-row">
+      <label for="senha">Digite a sua key para acessar:</label>
+      <input id="senha" type="password" placeholder="Key de acesso">
+    </div>
+    <button class="primary" onclick="verificarSenha()">Entrar</button>
+    <p class="small small-note">COMPRE KEY COM: <strong>@1nXit</strong></p>
+  </div>
+
+  <div id="painel" style="display:none;">
+    <div class="tabs">
+      <div id="tab1" class="tab active" onclick="setTab(1)"><i class="fas fa-crosshairs"></i></div>
+      <div id="tab2" class="tab" onclick="setTab(2)"><i class="fas fa-cog"></i></div>
+      <div id="tab3" class="tab" onclick="setTab(3)"><i class="fas fa-bullseye"></i></div>
+    </div>
+
+    <div id="content" class="panel-content">
+      <div id="content1">
+        <div class="option">
+          <label>Aimbot Rage</label>
+          <div class="switch" id="swAimbot" onclick="toggle('swAimbot')"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <label>Precisão Full</label>
+          <div class="switch" id="swNeck" onclick="toggle('swNeck')"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <label>FOV</label>
+          <div class="fov-container">
+            <input id="fov" type="range" min="0" max="360" value="75" class="fov-slider" oninput="atualizarFOV(this.value)">
+            <span id="fovValue" class="fov-value">75°</span>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="small-note">Selecione o alvo:</div>
+          <select id="targetSelect" style="width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.02);border:1px dashed rgba(107,0,217,0.12);color:var(--muted);font-weight:700;font-size:14px;outline:none;">
+            <option value="head">🎯 Cabeça</option>
+            <option value="neck">🔴 Pescoço</option>
+            <option value="chest">💥 Peito</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="content2" style="display:none;">
+        <div class="option">
+          <label>NoRecoil</label>
+          <div class="switch" id="swRecoil" onclick="toggle('swRecoil')"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <label>Facilitar acertos na cabeça</label>
+          <div class="switch" id="swAuto" onclick="toggle('swAuto')"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <label>Aumentar Precisão</label>
+          <div class="switch" id="swSens" onclick="toggle('swSens')"><div class="knob"></div></div>
+        </div>
+      </div>
+
+      <div id="content3" style="display:none;">
+        <p style="margin:0 0 8px 0">Painel External.<br/>Feito por <strong>@Gbxwq </strong></p>
+        <p style="margin:0;font-size:13px;color:var(--muted)">Direitos autorais ©️ <strong>1nXit</strong> — Todos os direitos reservados.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--muted)">Uso apenas para demonstração. O autor não se responsabiliza por uso indevido.</p>
+      </div>
+    </div>
+
+    <div class="inject-wrap">
+      <button class="primary" onclick="abrirFreeFire()">Injetar Funções no Jogo</button>
+      <div id="notify" class="notify">Abrindo Free Fire...</div>
+      <div class="copyright">©️ 1n Xiter</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CORRECT = "1nxit";
+  function verificarSenha(){
+    const v = document.getElementById('senha').value.trim();
+    if (v === CORRECT){
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('painel').style.display = 'block';
+    } else {
+      alert('Senha incorreta! Tente novamente.');
+    }
+  }
+
+  function setTab(i){
+    for (let t = 1; t <= 3; t++){
+      document.getElementById('tab' + t).classList.remove('active');
+      document.getElementById('content' + t).style.display = 'none';
+    }
+    document.getElementById('tab' + i).classList.add('active');
+    document.getElementById('content' + i).style.display = 'block';
+  }
+
+  function toggle(id){
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isOn = el.classList.toggle('on');
+    el.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+  }
+
+  function atualizarFOV(valor) {
+    document.getElementById('fovValue').textContent = valor + '°';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const targetSelect = document.getElementById('targetSelect');
+    if (targetSelect) {
+      targetSelect.addEventListener('change', function() {
+        const targetNames = { 'head': 'CABEÇA', 'neck': 'PESCOÇO', 'chest': 'PEITO' };
+        console.log('Alvo selecionado:', targetNames[this.value]);
+      });
+    }
+
+    document.querySelectorAll('.switch').forEach(s => {
+      s.setAttribute('role','button');
+      s.setAttribute('tabindex','0');
+      s.setAttribute('aria-pressed', s.classList.contains('on') ? 'true' : 'false');
+      s.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          toggle(s.id);
+        }
+      });
+    });
+  });
+
+  function abrirFreeFire() {
+    const n = document.getElementById('notify');
+    n.style.display = 'block';
+    n.textContent = 'Abrindo Free Fire...';
+    const freeFireLinks = [
+      'freefire://',
+      'intent://com.dts.freefireth#Intent;scheme=freefire;package=com.dts.freefireth;end',
+      'intent://com.dts.freefireth/com.dts.freefireth.FFMainActivity#Intent;scheme=freefire;package=com.dts.freefireth;end',
+      'com.dts.freefireth://',
+      'freefire://com.dts.freefireth'
+    ];
+    let opened = false;
+    for (let link of freeFireLinks) {
+      try {
+        const a = document.createElement('a');
+        a.href = link;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        opened = true;
+        console.log('Tentando abrir com:', link);
+        break;
+      } catch (e) {
+        console.log('Erro com link:', link, e);
+      }
+    }
+    if (!opened) {
+      try {
+        window.location.href = 'freefire://';
+        opened = true;
+      } catch (e) {
+        console.log('Erro com window.location:', e);
+      }
+    }
+    setTimeout(() => {
+      if (!opened) {
+        n.textContent = 'Free Fire não encontrado. Abrindo Play Store...';
+        try {
+          window.open('market://details?id=com.dts.freefireth', '_blank');
+        } catch (e) {
+          window.open('https://play.google.com/store/apps/details?id=com.dts.freefireth', '_blank');
+          n.textContent = 'Abra o Free Fire manualmente';
+        }
+      }
+    }, 2000);
+    setTimeout(() => { n.style.display = 'none'; }, 4000);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && document.getElementById('loginSection').style.display !== 'none'){
+      verificarSenha();
+    }
+  });
+
+  // Canvas rain (drops brancas)
+  const canvas = document.getElementById('rain');
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let drops = [];
+
+  function resizeCanvas() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    initDrops();
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function initDrops(count = 300) {
+    drops = [];
+    for (let i = 0; i < count; i++) {
+      drops.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        l: 10 + Math.random() * 20,
+        xs: -2 + Math.random() * 4,
+        ys: 4 + Math.random() * 4
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; // gotas brancas
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (const d of drops) {
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + d.xs, d.y + d.l);
+    }
+    ctx.stroke();
+    move();
+  }
+
+  function move() {
+    for (const d of drops) {
+      d.x += d.xs;
+      d.y += d.ys;
+      if (d.y > height) {
+        d.y = -20;
+        d.x = Math.random() * width;
+      }
+    }
+  }
+
+  function loop() {
+    draw();
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => {
+      if(deferredPrompt) {
+        alert('Para melhor experiência, adicione este app à sua tela inicial!\n\nNo Chrome: ⋮ → "Adicionar à tela inicial"\nNo Safari: 📤 → "Adicionar à tela de início"');
+      }
+    }, 3000);
+  });
+  window.addEventListener('appinstalled', () => {
+    console.log('App instalado com sucesso!');
+    deferredPrompt = null;
+  });
+</script>
+</body>
+</html>
